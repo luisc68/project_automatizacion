@@ -97,94 +97,91 @@ def editarvideo():
 #SUBIR VIDEO A TIKTOK
 def subirtiktok():
     print("subir video a tiktok")
-  print('Running bot now, get ready and login manually...')
-time.sleep(4)
+    print('Running bot now, get ready and login manually...')
+    time.sleep(4)
 
-options = webdriver.ChromeOptions()
-# options.add_experimental_option('excludeSwitches', ['enable-logging'])
-options.add_argument("--log-level=3")
-options.add_argument("user-data-dir=C:\\Users\\User\\AppData\\Local\\Google\\Chrome Beta\\User Data\\")
-options.binary_location = "C:\\Program Files\\Google\\Chrome Beta\\Application\\chrome.exe"
-bot = webdriver.Chrome(options=options,  executable_path=CM().install())
-bot.set_window_size(1680, 900)
-
-
-bot.get('https://www.tiktok.com/upload/?lang=en')
+    options = webdriver.ChromeOptions()
+    # options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    options.add_argument("--log-level=3")
+    options.add_argument("user-data-dir=C:\\Users\\josel\\AppData\\Local\\Google\\Chrome Beta\\User Data\\")##RUTA DEL PERFIL (CHROME VERSION)
+    options.binary_location = "C:\\Program Files\\Google\\Chrome Beta\\Application\\chrome.exe" ##RUTA EJECUTABLE(CHROME VERSION)
+    bot = webdriver.Chrome(options=options,  executable_path=CM().install())
+    bot.set_window_size(1680, 900)
 
 
-def check_exists_by_xpath(driver, xpath):
-    try:
-        driver.find_element_by_xpath(xpath)
-    except NoSuchElementException:
-        return False
-
-    return True
+    bot.get('https://www.tiktok.com/upload/?lang=en')
 
 
-def upload(video_path):
-    while True:
-        file_uploader = bot.find_element_by_xpath(
-            '//*[@id="main"]/div[2]/div/div[2]/div[2]/div/div/input')
+    def check_exists_by_xpath(driver, xpath):
+        try:
+            driver.find_element_by_xpath(xpath)
+        except NoSuchElementException:
+            return False
 
-        file_uploader.send_keys(video_path)
+        return True
 
-        caption = bot.find_element_by_xpath(
-            '//*[@id="main"]/div[2]/div/div[2]/div[3]/div[1]/div[1]/div[2]/div/div[1]/div/div/div/div/div/div/span')
 
-        bot.implicitly_wait(10)
-        ActionChains(bot).move_to_element(caption).click(
-            caption).perform()
-        # ActionChains(bot).key_down(Keys.CONTROL).send_keys(
-        #     'v').key_up(Keys.CONTROL).perform()
+    def upload(video_path):
+        while True:
+            file_uploader = bot.find_element_by_xpath(
+                '//*[@id="main"]/div[2]/div/div[2]/div[2]/div/div/input')
 
-        with open(r"caption.txt", "r") as f:
-            tags = [line.strip() for line in f]
+            file_uploader.send_keys(video_path)
 
-        for tag in tags:
-            ActionChains(bot).send_keys(tag).perform()
-            time.sleep(2)
-            ActionChains(bot).send_keys(Keys.RETURN).perform()
+            caption = bot.find_element_by_xpath(
+                '//*[@id="main"]/div[2]/div/div[2]/div[3]/div[1]/div[1]/div[2]/div/div[1]/div/div/div/div/div/div/span')
+
+            bot.implicitly_wait(10)
+            ActionChains(bot).move_to_element(caption).click(
+                caption).perform()
+            # ActionChains(bot).key_down(Keys.CONTROL).send_keys(
+            #     'v').key_up(Keys.CONTROL).perform()
+
+            with open(r"caption.txt", "r") as f:
+                tags = [line.strip() for line in f]
+
+            for tag in tags:
+                ActionChains(bot).send_keys(tag).perform()
+                time.sleep(2)
+                ActionChains(bot).send_keys(Keys.RETURN).perform()
+                time.sleep(1)
+
+            time.sleep(5)
+            bot.execute_script("window.scrollTo(150, 300);")
+            time.sleep(5)
+
+            post = WebDriverWait(bot, 100).until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, '//*[@id="main"]/div[2]/div/div[2]/div[3]/div[5]/button[2]')))
+
+            post.click()
+            time.sleep(30)
+
+            if check_exists_by_xpath(bot, '//*[@id="portal-container"]/div/div/div[1]/div[2]'):
+                reupload = WebDriverWait(bot, 100).until(EC.visibility_of_element_located(
+                    (By.XPATH, '//*[@id="portal-container"]/div/div/div[1]/div[2]')))
+
+                reupload.click()
+            else:
+                print('Unknown error cooldown')
+                while True:
+                    time.sleep(600)
+                    post.click()
+                    time.sleep(15)
+                    if check_exists_by_xpath(bot, '//*[@id="portal-container"]/div/div/div[1]/div[2]'):
+                        break
+
+            if check_exists_by_xpath(bot, '//*[@id="portal-container"]/div/div/div[1]/div[2]'):
+                reupload = WebDriverWait(bot, 100).until(EC.visibility_of_element_located(
+                    (By.XPATH, '//*[@id="portal-container"]/div/div/div[1]/div[2]')))
+                reupload.click()
+
             time.sleep(1)
 
-        time.sleep(5)
-        bot.execute_script("window.scrollTo(150, 300);")
-        time.sleep(5)
-
-        post = WebDriverWait(bot, 100).until(
-            EC.visibility_of_element_located(
-                (By.XPATH, '//*[@id="main"]/div[2]/div/div[2]/div[3]/div[5]/button[2]')))
-
-        post.click()
-        time.sleep(30)
-
-        if check_exists_by_xpath(bot, '//*[@id="portal-container"]/div/div/div[1]/div[2]'):
-            reupload = WebDriverWait(bot, 100).until(EC.visibility_of_element_located(
-                (By.XPATH, '//*[@id="portal-container"]/div/div/div[1]/div[2]')))
-
-            reupload.click()
-        else:
-            print('Unknown error cooldown')
-            while True:
-                time.sleep(600)
-                post.click()
-                time.sleep(15)
-                if check_exists_by_xpath(bot, '//*[@id="portal-container"]/div/div/div[1]/div[2]'):
-                    break
-
-        if check_exists_by_xpath(bot, '//*[@id="portal-container"]/div/div/div[1]/div[2]'):
-            reupload = WebDriverWait(bot, 100).until(EC.visibility_of_element_located(
-                (By.XPATH, '//*[@id="portal-container"]/div/div/div[1]/div[2]')))
-            reupload.click()
-
-        time.sleep(1)
-
-# ================================================================
-# Here is the path of the video that you want to upload in tiktok.
-upload(r"C:\\Users\\josel\Desktop\\python\\finalsubir.mp4")
-# ================================================================
-
-
-
+    # ================================================================
+    # Here is the path of the video that you want to upload in tiktok.
+    upload(r"C:\\Users\\josel\Desktop\\python\\finalsubir.mp4")
+    # ================================================================
 
 #CRONJOB
 def automatizacion():
@@ -207,4 +204,4 @@ while True:
     schedule.run_pending()
     time.sleep(1)
 
-
+#automatizacion() # PROBAR CODIGO SIN EL HORARIO
